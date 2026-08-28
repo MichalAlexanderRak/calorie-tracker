@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block main %}
+    <form action="/index" method="get">
+        <table>
+           <h3>Breakfast</h3>
+           <ul>
+                {% for rows in data %}
+                    {% if rows["meal_type"] == "Breakfast" %}
+                    <li>{{ rows["name"] }} - {{ (rows["kcal"] / 100) * rows["weight"] }} kcal</li>
+                    {% endif %}
+                {% endfor %}
+           </ul>
+            <h3>Lunch</h3>
+           <ul>
+                {% for rows in data %}
+                    {% if rows["meal_type"] == "Lunch" %}
+                    <li>{{ rows["name"] }} - {{ (rows["kcal"] / 100) * rows["weight"] }} kcal</li>
+                    {% endif %}
+                {% endfor %}
+           </ul>
+            <h3>Dinner</h3>
+           <ul>
+                {% for rows in data %}
+                    {% if rows["meal_type"] == "Dinner" %}
+                    <li>{{ rows["name"] }} - {{ (rows["kcal"] / 100) * rows["weight"] }} kcal</li>
+                    {% endif %}
+                {% endfor %}
+           </ul>
+            <h3>TOTALS</h3>
+            <ul>
+                   <li>{% print(total_kcal) %}</li>
+                   <li>{% print(total_protein) %}</li>
+            </ul>
+        </table>
+    </form>
+{% endblock %}

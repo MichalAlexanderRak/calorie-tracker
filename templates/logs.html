@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}Logs{% endblock %}
+
+{% block main %}
+    <form action="/logs" method="post">
+        <input type="hidden" name="food_id" value="{{ check['food_id']}}">
+        <input type="hidden" name="weight" value="{{ weight }}">
+        <table>
+            <tr>
+                <th> {{ check["name"]}} </th>
+                <th>Kcal {{ check["kcal"]}} </th>
+                <th>Protein {{ check["protein"]}} </th>
+                <th>Fat {{ check["fat"]}} </th>
+                <th>Carbs{{ check["carbs"]}} </th>
+                <th>Fibre {{ check["fibre"]}} </th>
+            </tr>
+             <tr>
+                <tr> {{ check["name"]}} </tr>
+                <tr>Kcal {{ ((check["kcal"] / 100) * weight) | round(2) }} </tr>
+                <tr>Protein {{ ((check["protein"] / 100) * weight) | round(2)}} </tr>
+                <tr>Fat {{ ((check["fat"] / 100) * weight) | round(2)}} </tr>
+                <tr>Carbs{{ ((check["carbs"] / 100) * weight) | round(2)}} </tr>
+                <tr>Fibre {{ ((check["fibre"] / 100) * weight) | round(2)}} </tr>
+            </tr>
+        </table>
+        <select name="time">
+            <option name="Breakfast">Breakfast</option>
+            <option name="Lunch">Lunch</option>
+            <option name="Dinner">Dinner</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}Food{% endblock %}
+
+{% block main %}
+    <form action="/food" method="post">
+        <input type="text" name="food" placeholder="food">
+        <input type="number" name="weight" placeholder="weight">
+        <select name="type">
+            <option name="SR Legacy">SR Legacy</option>
+            <option name="Branded">Branded</option>
+        </select>
+        <button type="submit">Lookup</button>
+    </form>
+{% endblock %}
