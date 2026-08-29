@@ -28,7 +28,7 @@ con = sqlite3.connect("calories.db",)
 cur = con.cursor()
 if __name__ == "app":
     cur.execute("CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY, username TEXT UNIQUE, hash" \
-    " TEXT, weight REAL, height REAL, age INTEGER, gender TEXT, activity_level REAL)"
+    " TEXT, weight REAL, height REAL, age INTEGER, gender INTEGER, activity_level REAL)"
 )
     con.commit()  
     cur.execute("CREATE TABLE IF NOT EXISTS foods (food_id INTEGER PRIMARY KEY, name TEXT, kcal REAL," \
@@ -43,6 +43,8 @@ if __name__ == "app":
 @app.route("/")
 def index():
 
+    if not session.get("user_id"):
+        return redirect("/login")
     con = sqlite3.connect("calories.db",)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
@@ -50,20 +52,32 @@ def index():
                "WHERE logs.user_id = ? AND logs.date = CURRENT_DATE",(session["user_id"],)
      )
     data = cur.fetchall()
-    con.commit()  
+    cur.execute("SELECT * FROM users WHERE id = ?",(session["user_id"],)
+         )
+    goal = cur.fetchone()
+
+    bmr = 10 * goal["weight"] + 6.25 * goal["height"] - 5 * goal["age"]
+    if goal["gender"] == 1:
+        bmr = bmr + 5
+    elif goal["gender"] == 0:
+        bmr = bmr - 161
+    tdee = bmr * goal["activity_level"]
+    
+        
     total_kcal = 0
     total_protein = 0
     for row in data:
        total_kcal += (row["kcal"])/ 100 * row["weight"]
        total_protein += (row["protein"])/ 100 * row["weight"]
-    return render_template("index.html", data = data, total_kcal = total_kcal, total_protein = total_protein)
+    return render_template("index.html", data = data, total_kcal = total_kcal,
+                            total_protein = total_protein, tdee = tdee, bmr = bmr)
 
 @app.route("/login", methods = ["GET", "POST"])
 def login():
 
     session.clear()
     if request.method == "GET":
-        render_template("login.html")
+        return render_template("login.html")
     if request.method == "POST":
         if not request.form.get("username"):
             return "must provide username 400"
@@ -85,7 +99,9 @@ def login():
             session["user_id"] = id[0][0]
             print(session)
         con.close()
-        return render_template("layout.html")
+        if id[0][3] is None:
+            return redirect("/biometrics")
+        return redirect("/")
     return render_template("login.html")
 
 @app.route("/logout")
@@ -93,7 +109,7 @@ def logout():
 
     session.clear()
 
-    return redirect("/")
+    return render_template("login.html")
 
 
 
@@ -148,27 +164,31 @@ def food():
             params={"query": request.form.get("food"), "api_key": api_key}
             )
             data = response.json()
-        
+            selected_food = None
+
             for food in data["foods"]:
                 if (food["dataType"]) == request.form.get("type"):
                     selected_food = food
                     break
-        
-            for nutrient in selected_food["foodNutrients"]:
-                if nutrient["nutrientName"] == "Protein":
-                    print(nutrient["value"])
-                    protein = nutrient["value"]
-                elif nutrient["nutrientName"] == "Total lipid (fat)":
-                    print(nutrient["value"])
-                    fat = nutrient["value"] 
-                elif nutrient["nutrientName"] == "Energy" and nutrient["unitName"] == "KCAL":
-                    print(selected_food["foodNutrients"])
-                    print(nutrient)
-                    kcal = nutrient["value"]
-                elif nutrient["nutrientName"] == "Carbohydrate, by difference":
-                    carbs = nutrient["value"]
-                elif nutrient["nutrientName"] == "Fiber, total dietary":
-                    fibre = nutrient["value"]
+           
+            if not selected_food:
+                return "invalid food name"
+            else:
+                for nutrient in selected_food["foodNutrients"]:
+                    if nutrient["nutrientName"] == "Protein":
+                        print(nutrient["value"])
+                        protein = nutrient["value"]
+                    elif nutrient["nutrientName"] == "Total lipid (fat)":
+                        print(nutrient["value"])
+                        fat = nutrient["value"] 
+                    elif nutrient["nutrientName"] == "Energy" and nutrient["unitName"] == "KCAL":
+                        print(selected_food["foodNutrients"])
+                        print(nutrient)
+                        kcal = nutrient["value"]
+                    elif nutrient["nutrientName"] == "Carbohydrate, by difference":
+                        carbs = nutrient["value"]
+                    elif nutrient["nutrientName"] == "Fiber, total dietary":
+                        fibre = nutrient["value"]
 
             con = sqlite3.connect("calories.db",)
             con.row_factory = sqlite3.Row
@@ -201,6 +221,29 @@ def logs():
         con.close()
 
     return redirect("/")
+@app.route("/biometrics", methods=["GET","POST"])
+def biometrics():
+    if request.method == "GET":
+        return render_template("biometrics.html")
+    if request.method == "POST":
+        gender_value = 1 if request.form.get("gender") == "MALE" else 0
+        if request.form.get("activity") == "HIGH":
+            activity_level = 1.9
+        elif request.form.get("activity") == "MEDIUM":
+            activity_level = 1.55
+        elif request.form.get("activity") == "LOW":
+            activity_level = 1.2
+
+        con = sqlite3.connect("calories.db",)
+        cur = con.cursor()   
+        cur.execute("UPDATE users SET weight = ?, height = ?, age = ?, gender = ?, activity_level = ? WHERE id = ?",
+                    (request.form.get("weight"), request.form.get("height"), request.form.get("age"), 
+                    gender_value, activity_level, session["user_id"]),
+        )
+        con.commit() 
+        con.close()
+        return redirect("/")
+
 
 #request.form.get("food"), (kcal / 100) * int(request.form.get("weight")), (protein / 100) * int(request.form.get("weight")),
  #                       (carbs / 100) * int(request.form.get("weight")), (fat / 100) * int(request.form.get("weight")), (fibre / 100) * int(request.form.get("weight"))

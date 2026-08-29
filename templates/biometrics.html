@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}Biometrics{% endblock %}
+
+{% block main %}
+    <form action="/biometrics" method="post">
+        <input type="number" name="weight" placeholder="weight">
+        <input type="number" name="height" placeholder="height">
+        <input type="number" name="age" placeholder="age">
+        <select name="gender">
+            <option value="MALE">MALE</option>
+            <option value="FEMALE">FEMALE</option>
+        </select>
+        <select name="activity">
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+        </select>
+        <button type="submit">Enter</button>
+    </form>
+{% endblock %}
