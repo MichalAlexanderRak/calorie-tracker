@@ -3,13 +3,15 @@
 {% block title %}Food{% endblock %}
 
 {% block main %}
+<div class="row justify-content-center"><div class="col-md-4">
     <form action="/food" method="post">
-        <input type="text" name="food" placeholder="food">
-        <input type="number" name="weight" placeholder="weight">
-        <select name="type">
+        <input type="text" class="form-control mb-3" name="food" placeholder="food">
+        <input type="number" class="form-control mb-3" name="weight" placeholder="weight">
+        <select name="type" class="form-select mb-3">
             <option name="SR Legacy">SR Legacy</option>
             <option name="Branded">Branded</option>
         </select>
-        <button type="submit">Lookup</button>
+        <button type="submit" class="btn btn-primary">Lookup</button>
     </form>
+</div></div>
 {% endblock %}

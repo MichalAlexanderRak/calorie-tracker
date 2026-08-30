@@ -4,38 +4,44 @@
 
 {% block main %}
     <form action="/index" method="get">
-        <table>
-           <h3>Breakfast</h3>
-           <ul>
+        <div class="card mb-3">
+            <div class="card-header">Breakfast</div>
+            <ul class="list-group list-group-flush">
                 {% for rows in data %}
                     {% if rows["meal_type"] == "Breakfast" %}
-                    <li>{{ rows["name"] }} - {{ (rows["kcal"] / 100) * rows["weight"] }} kcal</li>
+                    <li class="list-group-item">{{ rows["name"] }} - {{ ((rows["kcal"] / 100) * rows["weight"]) | round(1) }} kcal</li>
                     {% endif %}
                 {% endfor %}
            </ul>
-            <h3>Lunch</h3>
-           <ul>
+           </div>
+        <div class="card mb-3">
+            <div class="card-header">Lunch</div>
+            <ul class="list-group list-group-flush">
                 {% for rows in data %}
                     {% if rows["meal_type"] == "Lunch" %}
-                    <li>{{ rows["name"] }} - {{ (rows["kcal"] / 100) * rows["weight"] }} kcal</li>
+                    <li class="list-group-item">{{ rows["name"] }} - {{ ((rows["kcal"] / 100) * rows["weight"]) | round(1) }} kcal</li>
                     {% endif %}
                 {% endfor %}
-           </ul>
-            <h3>Dinner</h3>
-           <ul>
+            </ul>
+            </div>
+        <div class="card mb-3">
+            <div class="card-header">Dinner</div>
+            <ul class="list-group list-group-flush">
                 {% for rows in data %}
                     {% if rows["meal_type"] == "Dinner" %}
-                    <li>{{ rows["name"] }} - {{ (rows["kcal"] / 100) * rows["weight"] }} kcal</li>
+                    <li class="list-group-item">{{ rows["name"] }} - {{ ((rows["kcal"] / 100) * rows["weight"]) | round(1) }} kcal</li>
                     {% endif %}
                 {% endfor %}
            </ul>
+        </div>
             <h3>TOTALS</h3>
             <ul>
-                   <li>{% print(total_kcal) %}</li>
-                   <li>{% print(total_protein) %}</li>
-                   <li>{% print(bmr)%}</li>
-                   <li>{% print(tdee)%}</li>
+                <li>Kcal today {{ total_kcal | round(1) }}</li>
+                <li>Protein today {{ total_protein | round(1) }} g</li>
+                <li>Kcal Goal {{ tdee | round(1) }}</li>
             </ul>
-        </table>
+            <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: {{ (total_kcal / tdee) * 100 }}%;">{{ ((total_kcal / tdee) * 100) | round(1)}}%</div>  
+            </div>
     </form>
 {% endblock %}

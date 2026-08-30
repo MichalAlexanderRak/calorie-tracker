@@ -3,19 +3,21 @@
 {% block title %}Biometrics{% endblock %}
 
 {% block main %}
+<div class="row justify-content-center"><div class="col-md-4">
     <form action="/biometrics" method="post">
-        <input type="number" name="weight" placeholder="weight">
-        <input type="number" name="height" placeholder="height">
-        <input type="number" name="age" placeholder="age">
-        <select name="gender">
+        <input type="number" class="form-control mb-3" name="weight" placeholder="weight">
+        <input type="number" class="form-control mb-3" name="height" placeholder="height">
+        <input type="number" class="form-control mb-3" name="age" placeholder="age">
+        <select name="gender" class="form-select mb-3">
             <option value="MALE">MALE</option>
             <option value="FEMALE">FEMALE</option>
         </select>
-        <select name="activity">
+        <select name="activity" class="form-select mb-3">
             <option value="LOW">LOW</option>
             <option value="MEDIUM">MEDIUM</option>
             <option value="HIGH">HIGH</option>
         </select>
-        <button type="submit">Enter</button>
+        <button type="submit" class="btn btn-primary">Enter</button>
     </form>
+</div></div>
 {% endblock %}
