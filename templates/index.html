@@ -55,6 +55,6 @@
                 <li>Kcal Goal {{ tdee | round(1) }}</li>
             </ul>
             <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: {{ (total_kcal / tdee) * 100 }}%;">{{ ((total_kcal / tdee) * 100) | round(1)}}%</div>  
+                    <div class="progress-bar" role="progressbar" style="width: {{ ((total_kcal / tdee) * 100) }}%;">{{ ((total_kcal / tdee) * 100) | round(1)}}%</div>  
             </div>
 {% endblock %}

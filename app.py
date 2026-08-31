@@ -15,15 +15,6 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-#response = requests.get(
- #   "https://api.nal.usda.gov/fdc/v1/foods/search",
-  #  params={"query": "chicken breast", "api_key": api_key}
-#)
-#data = response.json()
-
-
-#print(data["foods"][0]["description"])
-
 con = sqlite3.connect("calories.db",)
 cur = con.cursor()
 if __name__ == "app":
@@ -263,7 +254,3 @@ def delete():
             con.close()
             return redirect("/")
     
-
-
-#request.form.get("food"), (kcal / 100) * int(request.form.get("weight")), (protein / 100) * int(request.form.get("weight")),
- #                       (carbs / 100) * int(request.form.get("weight")), (fat / 100) * int(request.form.get("weight")), (fibre / 100) * int(request.form.get("weight"))
