@@ -52,16 +52,18 @@ def index():
                "WHERE logs.user_id = ? AND logs.date = CURRENT_DATE",(session["user_id"],)
      )
     data = cur.fetchall()
-    cur.execute("SELECT * FROM users WHERE id = ?",(session["user_id"],)
+    cur.execute("SELECT * FROM users WHERE user_id = ?",(session["user_id"],)
          )
     goal = cur.fetchone()
-
-    bmr = 10 * goal["weight"] + 6.25 * goal["height"] - 5 * goal["age"]
-    if goal["gender"] == 1:
-        bmr = bmr + 5
-    elif goal["gender"] == 0:
-        bmr = bmr - 161
-    tdee = bmr * goal["activity_level"]
+    if not goal:
+        return redirect("biometrics")
+    else:
+        bmr = 10 * goal["weight"] + 6.25 * goal["height"] - 5 * goal["age"]
+        if goal["gender"] == 1:
+            bmr = bmr + 5
+        elif goal["gender"] == 0:
+            bmr = bmr - 161
+        tdee = bmr * goal["activity_level"]
     
         
     total_kcal = 0
@@ -224,7 +226,14 @@ def logs():
 @app.route("/biometrics", methods=["GET","POST"])
 def biometrics():
     if request.method == "GET":
-        return render_template("biometrics.html")
+        con = sqlite3.connect("calories.db",)
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()   
+        cur.execute("SELECT * FROM users WHERE user_id = ?",(session["user_id"],)
+                )
+        stats = cur.fetchone()
+        con.close()
+        return render_template("biometrics.html", stats = stats)
     if request.method == "POST":
         gender_value = 1 if request.form.get("gender") == "MALE" else 0
         if request.form.get("activity") == "HIGH":
@@ -236,13 +245,24 @@ def biometrics():
 
         con = sqlite3.connect("calories.db",)
         cur = con.cursor()   
-        cur.execute("UPDATE users SET weight = ?, height = ?, age = ?, gender = ?, activity_level = ? WHERE id = ?",
+        cur.execute("UPDATE users SET weight = ?, height = ?, age = ?, gender = ?, activity_level = ? WHERE user_id = ?",
                     (request.form.get("weight"), request.form.get("height"), request.form.get("age"), 
                     gender_value, activity_level, session["user_id"]),
         )
-        con.commit() 
+        con.commit()
         con.close()
         return redirect("/")
+
+@app.route("/delete", methods=["POST"])
+def delete():
+            con = sqlite3.connect("calories.db",)
+            cur = con.cursor()   
+            cur.execute("DELETE FROM logs WHERE log_id = ? AND user_id = ?",(request.form.get("log_id"), session["user_id"],)
+            )
+            con.commit() 
+            con.close()
+            return redirect("/")
+    
 
 
 #request.form.get("food"), (kcal / 100) * int(request.form.get("weight")), (protein / 100) * int(request.form.get("weight")),
